@@ -1,0 +1,34 @@
+#!/bin/bash
+b="-h"
+a=${1:-$b}
+if [ $a = "-v" ]
+then
+    echo 'SSHOverP3 v0.1'
+    echo 'platform linux-darwin x86_64'
+    echo 'Licensed under GNU GPLv3.'
+    echo 'See https://github.com/themirrazzalt/ssh-over-p3/ for more info.'
+else
+    if [ $a = "-p" ]
+    then
+        node ./passwd.js
+    else
+        if [ $a = "-c" ]
+        then
+            node ./ssh_client.js
+        else
+            if [ $a = "-s" ]
+            then
+                node ./host_server.js
+            else
+                echo "SSHOverP3 Help"
+                echo 'Usage: sshoverp3 [option]'
+                echo 'Options:'
+                echo '-p   Change server password'
+                echo '-v      Version information'
+                echo '-c             Start client'
+                echo '-s             Start server'
+                echo '-h  Displays this help menu'
+            fi
+        fi
+    fi
+fi
