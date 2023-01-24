@@ -16,6 +16,7 @@ To start the server: `node host_server.js`<br>
 To start the client: `node ssh_client.js`<br>
 
 ## Installing (Linux, Mac, UNIX, and chromeOS)
+> Coming Soon
 1. Download `./install-unix.sh` to the folder you want to install SSHOverP3 in
 2. Open a terminal (BASH on Mac and most Linux distros, ZSH on Manjaro)
 3. `cd` to the directory you downloaded the script to
