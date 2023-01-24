@@ -8,5 +8,7 @@ console.log('Enter a new password:');
 process.stdin.on('data', passwd => {
     config.password=md5(passwd);
     console.clear();
-    fs.writeFileSync('./config.json',JSON.stringify(config))
+    fs.writeFileSync('./config.json',JSON.stringify(config));
+    console.log('Password saved!');
+    process.exit();
 })
