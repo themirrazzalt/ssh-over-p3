@@ -68,7 +68,6 @@ process.stdin.on('data', data => {
                 process.stdin.setRawMode(true);
                 state = 'stdin';
             } else if(data.type == 'stdout') {
-                console.log('stdout: '+data.data)
                 process.stdout.write(data.data);
             } else if(data.type == 'stderr') {
                 process.stderr.write(data.data);

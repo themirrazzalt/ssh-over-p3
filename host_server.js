@@ -67,11 +67,14 @@ p3.listen(281, client => {
                 data: state
             });
             setTimeout(_ => {
-                shell.kill()
-            },5000)
-            setTimeout(_ => {
-                shell = child_process.exec('sh', {
+                shell = child_process.spawn(config.shell, {
                     cwd: os.homedir()
+                });
+                shell.stdout.on('readable', _ => {
+                    shell.stdout.read()
+                });
+                shell.stderr.on('readable', _ => {
+                    shell.stderr.read()
                 });
                 shell.stdout.on('data', data => {
                     client.emit({
