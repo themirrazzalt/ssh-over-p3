@@ -27,17 +27,18 @@ var client;
 var state = 'loading_network';
 var client_state = null;
 
-console.log('Waiting to connect to the P3 network...');
 p3.on('connect', _ => {
     state = 'get_address';
-    console.log('Connected on P3 address '+p3.adr);
     console.log('Enter the P3 address of the device you would like to SSH into:');
 });
 p3.on('fail', error => {
-    console.error('The following error occurred when attempting to connect to the P3 network: '+error);
-    console.error('The system will now be terminated.');
+    console.error('Failed to connect to the P3 network: '+error);
+    console.log('Troubleshooting tips:');
+    console.log('- make sure the P3 relay you\'re using is up');
+    console.log('- make sure your device is connected to the internet');
+    console.log('- make sure the P3 relay you\'re using isn\'t blocked in your area');
     process.exit();
-})
+});
 
 process.stdin.on('data', data => {
     if(state=='get_address'||state=='authorize') { data=data.slice(0,data.length-1) }
@@ -45,10 +46,10 @@ process.stdin.on('data', data => {
     if(state == 'get_address') {
         address = text;
         client_state = 'login';
-        state = 'authorize';
         client = p3.createClient(address, 281);
         client.on('connect', _ => {
-            console.log(`Successfully connected to server at ${address}. Please enter the login password:`);
+            console.log(`Enter the password for ${address}:`);
+            process.stdin.read()
             state = 'authorize';
             client_state='login'
         });
@@ -74,7 +75,6 @@ process.stdin.on('data', data => {
             }
         });
         client.on('disconnect', _ => {
-            console.log('The server ('+address+') has terminated the connection.');
             process.exit();
         })
     } else if(state == 'authorize') {

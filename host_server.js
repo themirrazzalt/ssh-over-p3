@@ -1,6 +1,7 @@
 var fs = require('fs');
 var child_process = require('child_process');
 var P3 = require('./node-p3');
+var pty = require('node-pty');
 var os = require('os');
 var md5=require('md5');
 var config = JSON.parse(
@@ -8,8 +9,10 @@ var config = JSON.parse(
 );
 var oldcfg = require('./config.json');
 
+
 if(!config.password) {
     console.error('No password set, please modify the config.json file. The server will now exit.');
+    console.log('Pro tip: run `node passwd.js` to change the server password.')
     process.exit();
 }
 
@@ -43,7 +46,7 @@ p3.on('connect', _ => {
 p3.listen(281, client => {
     var state = 'login';
     var shell;
-    console.log('New client connected at '+client.peer.adr)
+    //console.log('New client connected at '+client.peer.adr)
     client.on('message', data => {
         if(data.type == 'auth') {
             if(state == 'shell') {
@@ -67,29 +70,17 @@ p3.listen(281, client => {
                 data: state
             });
             setTimeout(_ => {
-                shell = child_process.spawn(config.shell, {
-                    cwd: os.homedir()
+                shell = pty.spawn(config.shell, [], {
+                    cwd: os.homedir(),
+                    name: 'xterm-color',
+                    cols: 80,
+                    rows: 30
                 });
-                shell.stdout.on('readable', _ => {
-                    shell.stdout.read()
-                });
-                shell.stderr.on('readable', _ => {
-                    shell.stderr.read()
-                });
-                shell.stdout.on('data', data => {
+                shell.on('data', data => {
                     client.emit({
                         type: 'stdout',
                         data: data
                     })
-                });
-                shell.stderr.on('data', data => {
-                    client.emit({
-                        type: 'stderr',
-                        data: data
-                    })
-                });
-                shell.on('close', _ => {
-                    client.peer.disconnect();
                 });
                 client.on('disconnect', _ => {
                     shell.kill();
@@ -99,10 +90,7 @@ p3.listen(281, client => {
                 });
             }, 525)
         } else if (data.type == 'stdin') {
-            shell.stdin.write(data.data);
-            /*/ // add asterisk for testing
-            console.log('Stdin data '+data.data);
-            /**/
+            shell.write(data.data);
         }
     });
 })
